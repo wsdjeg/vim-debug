@@ -1,4 +1,6 @@
-
+"=============================================================================
+" This plugin is forked from vebugger
+"=============================================================================
 
 command! -nargs=0 VBGrepeat call vebugger#repeatLastUserAction()
 
