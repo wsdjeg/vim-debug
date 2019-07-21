@@ -1,3 +1,6 @@
+let s:SYS = SpaceVim#api#import('system')
+
+
 function! vebugger#powershell#start(entryFile,args)
 	let l:debuggerExe = 'powershell'
     let l:debugger=vebugger#std#startDebugger(shellescape(l:debuggerExe) . vebugger#util#commandLineArgsForProgram(a:args))
@@ -7,6 +10,10 @@ function! vebugger#powershell#start(entryFile,args)
 	if !has('win32')
 		call vebugger#std#openShellBuffer(l:debugger)
 	endif
+
+	call l:debugger.writeLine('Get-PSBreakpoint | Remove-PSBreakpoint')
+	call l:debugger.writeLine('Set-PSBreakpoint -Line 1 -Script ' . vebugger#util#WinShellSlash(a:entryFile))
+	call l:debugger.writeLine(vebugger#util#WinShellSlash(a:entryFile))
 
 	call l:debugger.addReadHandler(function('vebugger#powershell#_readProgramOutput'))
 	call l:debugger.addReadHandler(function('vebugger#powershell#_readWhere'))
@@ -35,7 +42,6 @@ function! vebugger#powershell#_readProgramOutput(pipeName,line,readResult,debugg
 		endif
 		if a:line=~'\v^\>'
 					\||a:line=~'\V\^[DBG]' "We don't want to print this particular line...
-					\||a:line=='--Return--'
 					\||a:line=='The program finished and will be restarted'
 			let self.programOutputMode=0
 		endif
@@ -52,8 +58,15 @@ endfunction
 
 function! vebugger#powershell#_readWhere(pipeName,line,readResult,debugger)
 	if 'out'==a:pipeName
+        echom a:line
+        " in doc it is:
         " At PS /home/jen/debug/test.ps1:6 char:1
-		let l:matches=matchstr(a:line,'\(At PS\s\+\)\@<=.*')
+        if s:SYS.isWindows
+            " At C:\Users\wsdjeg\Desktop\test.ps1:1 char:1 
+            let l:matches=matchstr(a:line,'\(At\s\+\)\@<=.*')
+        else
+            let l:matches=matchstr(a:line,'\(At PS\s\+\)\@<=.*')
+        endif
 
 		if !empty(l:matches)
 			let l:file=vebugger#util#WinShellSlash(join(split(l:matches, ':')[:-3]))
