@@ -80,7 +80,8 @@ function! vebugger#powershell#_readWhere(pipeName,line,readResult,debugger)
 endfunction
 
 function! vebugger#powershell#_readFinish(pipeName,line,readResult,debugger)
-	if a:line=='The program finished and will be restarted'
+    " @fixme the finish mark of powershell debugeer
+	if a:line=~'PS C:\Users'
 		let a:readResult.std.programFinish={'finish':1}
 	endif
 endfunction
