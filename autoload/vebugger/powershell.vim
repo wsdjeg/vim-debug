@@ -58,7 +58,6 @@ endfunction
 
 function! vebugger#powershell#_readWhere(pipeName,line,readResult,debugger)
 	if 'out'==a:pipeName
-        echom a:line
         " in doc it is:
         " At PS /home/jen/debug/test.ps1:6 char:1
         if s:SYS.isWindows
@@ -69,7 +68,7 @@ function! vebugger#powershell#_readWhere(pipeName,line,readResult,debugger)
         endif
 
 		if !empty(l:matches)
-			let l:file=vebugger#util#WinShellSlash(join(split(l:matches, ':')[:-3]))
+			let l:file=vebugger#util#WinShellSlash(join(split(l:matches, ':')[:-3], ':'))
 			if !empty(glob(l:file))
                 let l:line = split(l:matches, ':')[-2][:-6]
 				let a:readResult.std.location={
