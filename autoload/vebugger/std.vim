@@ -236,9 +236,10 @@ function! s:printWithFeedKeys(evaluatedExpression)
         let l:echo = a:evaluatedExpression.expression.': '.a:evaluatedExpression.value
     endif
     let l:echoLines = split(l:echo, '\r\n\|\n\|\r')
-    if len(l:echoLines) == 1
-        call add(l:echoLines, '')
-    endif
+    " @fixme remove extra line
+    " if len(l:echoLines) == 1
+        " call add(l:echoLines, '')
+    " endif
 
     if has('timers')
         " Convert to an expression we can use with feedkeys.
